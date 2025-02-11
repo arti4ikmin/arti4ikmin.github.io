@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discord Query Generator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+  <h1>Discord Search Query Generator</h1>
+
+  <div class="form-group">
+    <label for="author">From User ID:</label>
+    <input type="text" id="author" placeholder="User ID">
+  </div>
+
+  <div class="form-group">
+    <label for="mentions">Mentions User ID:</label>
+    <input type="text" id="mentions" placeholder="User ID">
+  </div>
+
+  <div class="form-group">
+    <label for="has">Has:</label>
+    <select id="has">
+      <option value="">Select...</option>
+      <option value="link">Link</option>
+      <option value="embed">Embed</option>
+      <option value="file">File</option>
+      <option value="video">Video</option>
+      <option value="image">Image</option>
+      <option value="sound">Sound</option>
+      <option value="sticker">Sticker</option>
+      <option value="snapshot">Forward (Snapshot)</option>
+      <option value="poll">Poll</option>
+    </select>
+  </div>
+
+  <div class="date-group">
+    <div class="form-group">
+      <label for="before">Before:</label>
+      <input type="date" id="before">
+    </div>
+    <div class="form-group">
+      <label for="during">During:</label>
+      <input type="date" id="during">
+    </div>
+    <div class="form-group">
+      <label for="after">After:</label>
+      <input type="date" id="after">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="channel">In Channel ID:</label>
+    <input type="text" id="channel" placeholder="Channel ID">
+  </div>
+
+  <div class="form-group">
+    <label for="pinned">Pinned:</label>
+    <select id="pinned">
+      <option value="">Select...</option>
+      <option value="true">Yes</option>
+      <option value="false">No</option>
+    </select>
+  </div>
+
+  <div class="output-group">
+    <label>Generated Query:</label>
+    <textarea id="output" readonly></textarea>
+    <button onclick="copyQuery()">Copy Query</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
