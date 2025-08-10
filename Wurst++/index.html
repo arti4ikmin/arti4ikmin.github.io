@@ -76,17 +76,32 @@
             text-align: center;
             margin-bottom: 25px;
         }
-        .features ul {
-            list-style: none;
-            padding: 0;
+        /* Table Styling */
+        .feature-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
         }
-        .features ul li {
+        .feature-table th, .feature-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #444;
+        }
+        .feature-table th {
+            background-color: #202225;
+            color: #ffffff;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .feature-table tbody tr:nth-child(even) {
             background-color: #36393f;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            border-left: 4px solid #a95300;
-            font-size: 1.1em;
+        }
+        .feature-table tbody tr:nth-child(odd) {
+            background-color: #2f3136;
+        }
+        .feature-table td:first-child {
+            font-weight: bold;
+            color: #e0e0e0;
         }
         .footer {
             background-color: #202225;
@@ -123,12 +138,53 @@
     <h2>Key Features</h2>
     <p>Wurst++ includes all of the original features from the official client, which you can see on the <a href="https://www.wurstclient.net/#features" style="color: #8ab4f8;" target="_blank" rel="noopener noreferrer">official Wurst website</a>, <br> plus these unique additions:</p>
 
-    <!-- To add a new feature, just copy and paste one of the <li> lines below -->
-    <ul>
-        <li>Hack - AutoMLG - </li>
-<!--        <li>No Analytics - Removes analytics of the official wurst client.</li>-->
-        <li>More smaller features...</li>
-    </ul>
+    <table class="feature-table">
+        <thead>
+        <tr>
+            <th>Feature</th>
+            <th>Category</th>
+            <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- To add a new feature, just copy and paste one of the <tr>...</tr> blocks below -->
+        <tr>
+            <td>AutoMLG</td>
+            <td>New Hack</td>
+            <td>Automates MLG water bucket/clutch maneuvers.</td>
+        </tr>
+        <tr>
+            <td>Lock interaction in freecam</td>
+            <td>New Feature</td>
+            <td>Allows locking interaction while in freecam mode.</td>
+        </tr>
+        <tr>
+            <td>Disable Wurst++ Logo</td>
+            <td>New Feature</td>
+            <td>Provides an option to disable the Wurst++ logo.</td>
+        </tr>
+        <tr>
+            <td>Tracers in Search Hack</td>
+            <td>New Feature</td>
+            <td>Implements tracers functionality within the Search Hack.</td>
+        </tr>
+        <tr>
+            <td>Removed Analytics</td>
+            <td>More Privacy</td>
+            <td>Enhances user privacy by removing analytic + download count logging.</td>
+        </tr>
+        <tr>
+            <td>Removed link redirect logging</td>
+            <td>More Privacy</td>
+            <td>Enhances user privacy by no longer logging link redirects.</td>
+        </tr>
+        <tr>
+            <td>More smaller features...</td>
+            <td>General</td>
+            <td>Various other minor improvements and additions.</td>
+        </tr>
+        </tbody>
+    </table>
 </div>
 
 <div class="footer">
