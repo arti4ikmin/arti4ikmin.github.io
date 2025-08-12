@@ -147,41 +147,9 @@
         </tr>
         </thead>
         <tbody>
-        <!-- To add a new feature, just copy and paste one of the <tr>...</tr> blocks below -->
+
         <tr>
-            <td>AutoMLG</td>
-            <td>New Hack</td>
-            <td>Automates MLG water bucket/clutch maneuvers.</td>
-        </tr>
-        <tr>
-            <td>Lock interaction in freecam</td>
-            <td>New Feature</td>
-            <td>Allows locking interaction while in freecam mode.</td>
-        </tr>
-        <tr>
-            <td>Disable Wurst++ Logo</td>
-            <td>New Feature</td>
-            <td>Provides an option to disable the Wurst++ logo.</td>
-        </tr>
-        <tr>
-            <td>Tracers in Search Hack</td>
-            <td>New Feature</td>
-            <td>Implements tracers functionality within the Search Hack.</td>
-        </tr>
-        <tr>
-            <td>Removed Analytics</td>
-            <td>More Privacy</td>
-            <td>Enhances user privacy by removing analytic + download count logging.</td>
-        </tr>
-        <tr>
-            <td>Removed link redirect logging</td>
-            <td>More Privacy</td>
-            <td>Enhances user privacy by no longer logging link redirects.</td>
-        </tr>
-        <tr>
-            <td>More smaller features...</td>
-            <td>General</td>
-            <td>Various other minor improvements and additions.</td>
+            <td colspan="3" style="text-align:center;">Loading latest features from GitHub...</td>
         </tr>
         </tbody>
     </table>
@@ -189,11 +157,136 @@
 
 <div class="footer">
     <p>Wurst++ is a fork of the Wurst Client and is not an official Wurst product.</p>
-    <p>The official Wurst Client can be found at <a href="https://www.wurstclient.net/" target="_blank" rel="noopener noreferrer">wurstclient.net</a>.</p>
+<!--    <p>The official Wurst Client can be found at <a href="https://www.wurstclient.net/" target="_blank" rel="noopener noreferrer">wurstclient.net</a>.</p>-->
     <p>NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.</p>
     <p>For more information, please see Minecraft's <a href="https://www.minecraft.net/en-us/usage-guidelines" target="_blank" rel="noopener noreferrer">Usage Guidelines</a>.</p>
     <p>&copy; 2025 Arti</p>
 </div>
+
+<script>
+    (() => {
+        const targetTbody = document.querySelector('.feature-table tbody');
+        if (!targetTbody) return;
+
+        const CACHE_KEY = 'wpp_features_cache_v1';
+        const CACHE_TTL = 6 * 60 * 60 * 1000;
+
+        try {
+            const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+            if (cached && (Date.now() - cached.ts) < CACHE_TTL) {
+                renderRows(cached.rows);
+                refresh().catch(() => {});
+                return;
+            }
+        } catch (_) {}
+
+        refresh().catch(err => {
+            console.error('Failed to auto-load features:', err);
+        });
+
+        async function refresh() {
+            const rows = await fetchFeatures();
+            if (rows && rows.length) {
+                renderRows(rows);
+                try {
+                    localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), rows }));
+                } catch (_) {}
+            }
+        }
+
+        async function fetchFeatures() {
+            const htmlRes = await fetch('https://api.github.com/repos/arti4ikmin/WurstPlusPlus/readme', {
+                headers: { Accept: 'application/vnd.github.v3.html' },
+                cache: 'no-store'
+            });
+
+            if (htmlRes.ok && (htmlRes.headers.get('content-type') || '').includes('text/html')) {
+                const html = await htmlRes.text();
+                return rowsFromGitHubHTML(html);
+            }
+
+            // Fallback: get raw markdown via JSON API and parse the table manually
+            const jsonRes = await fetch('https://api.github.com/repos/arti4ikmin/WurstPlusPlus/readme', {
+                headers: { Accept: 'application/vnd.github.v3+json' },
+                cache: 'no-store'
+            });
+            if (!jsonRes.ok) throw new Error('GitHub API error ' + jsonRes.status);
+            const data = await jsonRes.json();
+            if (!data.download_url) return [];
+            const md = await fetch(data.download_url, { cache: 'no-store' }).then(r => r.text());
+            return rowsFromMarkdown(md);
+        }
+
+        function rowsFromGitHubHTML(html) {
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            // In GitHub's README HTML, the heading looks like: <h2><a href="#exclusive-features">...</a> Exclusive features:</h2>
+            const anchor = doc.querySelector('a[href="#exclusive-features"], a[id="user-content-exclusive-features"], h2#exclusive-features');
+            const h2 = anchor ? (anchor.closest('h2') || anchor) : null;
+            if (!h2) throw new Error('Exclusive features heading not found');
+            let node = h2.nextElementSibling;
+            while (node && node.tagName && node.tagName.toLowerCase() !== 'table') node = node.nextElementSibling;
+            if (!node) throw new Error('Features table not found next to heading');
+
+            return Array.from(node.querySelectorAll('tbody tr'))
+                .map(tr => Array.from(tr.querySelectorAll('td')).map(td => td.textContent.trim()))
+                .filter(cells => cells.length >= 3 && cells.slice(0, 3).some(Boolean))
+                .map(cells => cells.slice(0, 3));
+        }
+
+        function rowsFromMarkdown(md) {
+            const startIdx = md.toLowerCase().indexOf('## exclusive features');
+            if (startIdx === -1) throw new Error('Exclusive features section not found');
+            const after = md.slice(startIdx);
+            const lines = after.split(/\r?\n/);
+
+            const tableLines = [];
+            let started = false;
+            for (const line of lines) {
+                if (!started) {
+                    if (/^\s*\|/.test(line)) { started = true; tableLines.push(line.trim()); }
+                } else {
+                    if (/^\s*\|/.test(line)) tableLines.push(line.trim());
+                    else break;
+                }
+            }
+            if (tableLines.length < 3) throw new Error('Table not found or too short');
+
+            const rows = [];
+            tableLines.forEach((ln, idx) => {
+                const cells = ln.split('|').slice(1, -1).map(c => c.trim());
+                if (idx === 0) return;
+                if (cells.every(c => /^:?-{3,}:?$/.test(c))) return;
+                if (cells.every(c => !c)) return;
+                rows.push(cells.slice(0, 3).map(stripMd));
+            });
+            return rows;
+        }
+
+        function stripMd(s) {
+            return s
+                .replace(/```math\s*([\s\S]*?)```KATEX_INLINE_OPEN[^]*?KATEX_INLINE_CLOSE/g, '$1')
+                .replace(/`([^`]+)`/g, '$1')
+                .replace(/[*_]{1,3}([^*_]+)[*_]{1,3}/g, '$1')
+                .replace(/\\\|/g, '|')
+                .trim();
+        }
+
+
+        function renderRows(rows) {
+            targetTbody.innerHTML = rows.map(([feature, category, description]) => `
+      <tr>
+        <td>${escapeHtml(feature)}</td>
+        <td>${escapeHtml(category)}</td>
+        <td>${escapeHtml(description)}</td>
+      </tr>
+    `).join('');
+        }
+
+        function escapeHtml(s) {
+            return (s || '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+        }
+    })();
+</script>
 
 </body>
 </html>
